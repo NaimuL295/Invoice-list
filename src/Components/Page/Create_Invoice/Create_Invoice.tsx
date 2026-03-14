@@ -8,7 +8,11 @@ export default function Create_Invoice() {
 
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [customer, setCustomer] = useState("");
-  const [Uid, setUid   ]=useState<number>()
+const [uid, setUid] = useState(1);
+
+const createId = () => {
+  setUid((prev) => prev + 1);
+};
   const [discount, setDiscount] = useState<number | "">("");
   const [received, setReceived] = useState<number | "">("");
   const [paymentType, setPaymentType] = useState("Cash");
@@ -27,6 +31,7 @@ export default function Create_Invoice() {
     e.preventDefault();
 
     const invoiceData = {
+      uid:uid,
       gmail,
       date,
       customer,
@@ -39,7 +44,7 @@ export default function Create_Invoice() {
       description,
       paymentType,
     };
-
+createId()
     console.log(invoiceData);
   };
 
@@ -56,7 +61,7 @@ export default function Create_Invoice() {
             <label className="block font-medium mb-1">Invoice No</label>
             <input
               type="text"
-              defaultValue="INV-"
+       defaultValue={uid}
               className="w-full  p-2 rounded-lg  border-none  focus:outline-none "
               placeholder=""
             />
