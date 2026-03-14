@@ -1,0 +1,253 @@
+import { useState } from "react";
+import { useInvoiceStore } from "../../../store/useInvoiceStore";
+import { Link } from "react-router";
+import Invoice_Items from "../../Share/Invoice_Items";
+
+export default function Create_Invoice() {
+  const items = useInvoiceStore((state) => state.items);
+
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [customer, setCustomer] = useState("");
+  const [Uid, setUid   ]=useState<number>()
+  const [discount, setDiscount] = useState<number | "">("");
+  const [received, setReceived] = useState<number | "">("");
+  const [paymentType, setPaymentType] = useState("Cash");
+  const [description, setDescription] = useState("");
+  const gmail: string = "naimul56@gmail.com";
+  // subtotal
+  const subtotal = items.reduce((acc, item) => {
+    return acc + item.quantity * item.price;
+  }, 0);
+
+  // total after discount
+  const total = subtotal - Number(discount || 0);
+  // // balance
+  const balance = total - Number(received || 0);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const invoiceData = {
+      gmail,
+      date,
+      customer,
+      items,
+      subtotal,
+      discount,
+      total,
+      received,
+      due: balance,
+      description,
+      paymentType,
+    };
+
+    console.log(invoiceData);
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-6 relative">
+      <h1 className="text-2xl sm:text-3xl font-bold text-center">
+        <Link to="/"> Create Invoice</Link>
+      </h1>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Invoice + Date */}
+        <div className="grid  grid-cols-2 gap-4   border-b-black">
+          <div>
+            <label className="block font-medium mb-1">Invoice No</label>
+            <input
+              type="text"
+              defaultValue="INV-"
+              className="w-full  p-2 rounded-lg  border-none  focus:outline-none "
+              placeholder=""
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium mb-1">Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full    p-2 rounded-lg  border-none  focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Customer */}
+
+        <div className="relative ">
+          <input
+            id="name"
+            type="text"
+            value={customer}
+            onChange={(e) => setCustomer(e.target.value)}
+            placeholder=""
+            required
+            className="peer w-full border border-gray-300 rounded-lg px-3 pt-5 pb-2 focus:outline-none focus:"
+          />
+
+          <label
+            htmlFor="name"
+            className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500 transition-all
+    peer-placeholder-shown:top-3
+    peer-placeholder-shown:text-base
+    peer-placeholder-shown:text-gray-400
+    peer-focus:-top-2
+    peer-focus:text-sm
+   "
+          >
+            Customer Name
+          </label>
+        </div>
+       
+        {/* Item List */}
+        <div className="space-y-3">
+          <Invoice_Items />
+        </div>
+
+        {/* Add Item */}
+        <Link to="add_item">
+          {" "}
+          <div className="border p-2 flex justify-center w-full sm:w-auto mx-auto mt-6">
+            Add_Item
+          </div>
+        </Link>
+        {/* Tax & Discount */}
+        <section className="space-y-2">
+          <span className="font-semibold text-lg">Tax & Discount</span>
+
+          {/* Discount */}
+          <div className="flex justify-between items-center">
+            <span>Discount</span>
+
+            <div className="flex items-center gap-1">
+              <span>৳ %</span>
+
+              {/* <input
+                type="number"
+                value={discount}
+                onChange={(e) => setDiscount(Number(e.target.value))}
+                className="w-24 sm:w-28 border-b focus:border-black outline-none"
+              /> */}
+              <input
+                type="number"
+                value={discount}
+                onChange={(e) =>
+                  setDiscount(
+                    e.target.value === "" ? "" : Number(e.target.value),
+                  )
+                }
+                className="w-24 sm:w-28 border-b outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Total Amount */}
+          <div className="flex justify-between items-center">
+            <span className="font-semibold text-lg">Total Amount</span>
+
+            <div className="flex items-center gap-1">
+              <span>৳</span>
+
+              <input
+                type="text"
+                value={total}
+                readOnly
+                className="w-28 sm:w-32 border-b font-bold outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Received */}
+          <div className="flex justify-between items-center">
+            <label className="flex items-center gap-2">
+              <input type="checkbox" />
+              Received
+            </label>
+
+            <div className="flex items-center gap-1">
+              <span>৳</span>
+
+              {/* <input
+                type="number"
+                value={received}
+                onChange={(e) => setReceived(Number(e.target.value))}
+                className="w-24 sm:w-28 border-b outline-none"
+              /> */}
+              <input
+                type="number"
+                value={received}
+                onChange={(e) =>
+                  setReceived(
+                    e.target.value === "" ? "" : Number(e.target.value),
+                  )
+                }
+                className="w-24 sm:w-28 border-b outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Balance */}
+          <div className="flex justify-between items-center">
+            <span>Balance Due</span>
+
+            <div className="flex items-center gap-1">
+              <span>৳</span>
+
+              <input
+                type="text"
+                value={balance}
+                readOnly
+                className="w-24 sm:w-28 border-b outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Payment Type */}
+          <div className="space-y-2">
+            <span className="font-medium">Payment Type</span>
+
+            <div className="">
+              <select
+                value={paymentType}
+                onChange={(e) => setPaymentType(e.target.value)}
+                className="border px-1 py-1 rounded w-full"
+              >
+                <option>Cash</option>
+                <option>Bkash</option>
+                <option>Card</option>
+              </select>
+
+              <button
+                type="button"
+                className="px-3 py-2 bg-gray-200 rounded w-full sm:w-auto"
+              >
+                + Payment
+              </button>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <span className="font-medium">Description</span>
+
+            <textarea
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full border rounded p-2 outline-none"
+            />
+          </div>
+        </section>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          className="w-full py-3 bg-black text-white rounded-lg"
+        >
+          Save Invoice
+        </button>
+      </form>
+    </div>
+  );
+}
