@@ -1,24 +1,34 @@
-import { useState } from "react";
+import {  useState } from "react";
 import { useInvoiceStore } from "../../../store/useInvoiceStore";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import Invoice_Items from "../../Share/Invoice_Items";
+import { Printer } from "lucide-react";
+import api from "../../../lib/axios";
+import useAuthStore from "../../../store/useAuthStore";
+
+
+
 
 export default function Create_Invoice() {
+  const {user}=useAuthStore()
   const items = useInvoiceStore((state) => state.items);
-
+const navigate = useNavigate();
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [customer, setCustomer] = useState("");
 const [uid, setUid] = useState(1);
 
-const createId = () => {
-  setUid((prev) => prev + 1);
-};
+// const clearItems = useInvoiceStore((state) => state.clearItems);
+
   const [discount, setDiscount] = useState<number | "">("");
   const [received, setReceived] = useState<number | "">("");
   const [paymentType, setPaymentType] = useState("Cash");
   const [description, setDescription] = useState("");
-  const gmail: string = "naimul56@gmail.com";
-  // subtotal
+  const email: string = "naimul56@gmail.com";
+    const user_name: string = "naimul";
+      const userId: number = 2;
+console.log(user);
+
+    // subtotal
   const subtotal = items.reduce((acc, item) => {
     return acc + item.quantity * item.price;
   }, 0);
@@ -27,26 +37,59 @@ const createId = () => {
   const total = subtotal - Number(discount || 0);
   // // balance
   const balance = total - Number(received || 0);
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+const createId = () => {
+  const id = uid + 1;
+  setUid(id);
+  return id;
+};
+const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+  e.preventDefault();
 
-    const invoiceData = {
-      uid:uid,
-      gmail,
-      date,
-      customer,
-      items,
-      subtotal,
-      discount,
-      total,
-      received,
-      due: balance,
-      description,
-      paymentType,
-    };
-createId()
-    console.log(invoiceData);
+const newId = createId(); 
+
+  if (!customer || items.length === 0) {
+    alert("Customer and items required");
+    return;
+  }
+
+  const invoiceData = {
+   uid: String(newId),
+           userId,
+    user_name,
+    email,
+    date,
+    customer,
+    items,
+    subtotal,
+    discount,
+    total,
+    received,
+    due: balance,
+    description,
+    paymentType,
   };
+console.log(invoiceData);
+
+  try {
+    const req = await api.post(
+      "/invoice",
+      invoiceData
+    );
+
+    if (req.status === 200 || req.status === 201) {
+      console.log("Invoice processed successfully!");
+      //  clearItems(); 
+      // setCustomer("");
+      // setDiscount(0);
+      // setReceived(0);
+
+      navigate("/");
+   
+    }
+  } catch (error) {
+    console.error("Error creating invoice:", error);
+  }
+};
 
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-6 relative">
@@ -246,12 +289,16 @@ createId()
         </section>
 
         {/* Submit */}
-        <button
+        <div className="flex gap-10">
+           <button
           type="submit"
           className="w-full py-3 bg-black text-white rounded-lg"
         >
           Save Invoice
-        </button>
+        </button><button type="button"   //onClick={handlePrint}
+        ><Printer /> </button>
+        </div>
+          
       </form>
     </div>
   );

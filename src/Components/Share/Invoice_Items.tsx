@@ -12,7 +12,7 @@ export default function Invoice_Items() {
          <Link to={`/edit/${item.id}`}>
           <div className="flex justify-between">
             <h3 className="font-semibold">
-              #{index + 1} {item.name}
+              #{index + 1} {item.item_name}
             </h3>
             <h3 className="text-sm text-gray-500">
               {item.quantity} x {item.price}

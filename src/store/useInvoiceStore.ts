@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 export type Item = {
   id: number;
-  name: string;
+  item_name: string;
   quantity: number;
   unit: string;
   price: number;
@@ -14,7 +14,7 @@ type InvoiceStore = {
   addItem: (item: Item) => void;
   editItem: (updatedItem: Item) => void; 
   deleteItem: (id:number) => void;
-  clearItems: (id: Item) => void;
+  clearItems: () => void;
 };
 
 export const useInvoiceStore = create<InvoiceStore>((set) => ({
@@ -36,5 +36,5 @@ deleteItem: (id) =>
     items: state.items.filter((item) => item.id !== id),
   })),
 
-  clearItems: () => set({ items: [] }),
+   clearItems: () => set({ items: [] }),
 }));
