@@ -43,7 +43,7 @@ const Add_Item_Page: React.FC = () => {
     setPrice("");
 
     // Navigate to create-invoice page
-    navigate("/");
+    navigate("/create");
   };
 
   const onAddUnit = () => {

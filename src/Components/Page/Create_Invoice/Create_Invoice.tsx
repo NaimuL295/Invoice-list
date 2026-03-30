@@ -53,10 +53,10 @@ const newId = createId();
   }
 
   const invoiceData = {
-   uid: String(newId),
-           userId,
-    user_name,
-    email,
+    uid: String(newId),
+    userId: user?.id,
+    user_name: user?.user_name,
+    email: user?.email,
     date,
     customer,
     items,

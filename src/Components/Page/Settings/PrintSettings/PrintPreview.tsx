@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef,  } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useQuery } from "@tanstack/react-query";
 import useAuthStore from "../../../../store/useAuthStore";
@@ -36,37 +36,37 @@ const layoutMap: Record<string, React.FC<LayoutProps>> = {
 
 const PrintPreview = () => {
   const { user } = useAuthStore();
-  const [layout, setLayout] = useState<string>("1");
+  // const [layout, setLayout] = useState<string>("1");
   const componentRef = useRef<HTMLDivElement>(null);
   const fetchPrint = async () => {
-    const res = await api.get(`/api/invoice/${user?.id}`, {
+    const res = await api.get(`/api/invoice?userid=${user?.id}`, {
       withCredentials: true,
     });
     return res.data;
-  };
+  };   
   const { data, isPending, isError } = useQuery({
     queryKey: ["PrintPreview", user?.id as number],
     queryFn: fetchPrint,
   });
   //  Fetch layout from backend
-  useEffect(() => {
-    const fetchLayout = async () => {
-      try {
-        const res = await api.get("/api/print-settings", {
-          withCredentials: true,
-        });
+  // useEffect(() => {
+  //   const fetchLayout = async () => {
+  //     try {
+  //       const res = await api.get(`/api/print-settings?userId=${user?.id}`, {
+  //         withCredentials: true,
+  //       });
 
-        // safe check
-        if (res.data?.layout) {
-          setLayout(String(res.data.layout));
-        }
-      } catch (error) {
-        console.error("Failed to fetch layout", error);
-      }
-    };
+  //       // safe check
+  //       if (res.data?.layout) {
+  //         setLayout(String(res.data.layout));
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to fetch layout", error);
+  //     }
+  //   };
 
-    fetchLayout();
-  }, []);
+  //   fetchLayout();
+  // }, []);
 
   //  Print handler
   const handlePrint = useReactToPrint({
@@ -74,7 +74,7 @@ const PrintPreview = () => {
     documentTitle: "Invoice Print",
   });
   //Select layout safely
-  const LayoutComponent = layoutMap[layout] || LayoutOne;
+  const LayoutComponent = layoutMap[data.layout] || LayoutOne;
 
   return (
     <div>

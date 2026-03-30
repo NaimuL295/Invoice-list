@@ -7,7 +7,7 @@ export default function Navbar() {
 
   return (
     <div className="lg:p-10 my-10">
-      <ul className="flex justify-between max-w-2xl m-auto  px-10">
+      <ul className="flex justify-between max-w-2xl m-auto  px-8">
         <li>
           <Link to="profile">
             <UserRoundPen />

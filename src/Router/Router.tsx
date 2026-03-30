@@ -10,6 +10,7 @@ import Register from "../Components/Page/Register/Register";
 import Settings from "../Components/Page/Settings/Settings";
 import Profile from "../Components/Page/Settings/Profile";
 import PrintSettings from "../Components/Page/Settings/PrintSettings/PrintSettings";
+import TransitionDetails from "../Components/Page/Home/TransitionDetails";
 //import ProtectedRoute from "./ProtectedRoute/ProtectedRoute";
 
 export const router = createBrowserRouter([
@@ -17,8 +18,9 @@ export const router = createBrowserRouter([
     path: "/",
     Component: Layout,
     children: [
-      { path: "/", Component: Create_Invoice },
-      { path: "add_Item", Component: Add_Item },
+      {index:true,Component:TransitionDetails},
+      { path: "create", Component:Create_Invoice },
+      { path: "create/add_Item", Component: Add_Item },
       { path: "/edit/:id", Component: Edit_Item_Page },
       { path: "profile", Component: Profile },
       {

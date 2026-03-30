@@ -1,12 +1,13 @@
 import axios from "axios";
 import React, { useState } from "react";
+import useAuthStore from "../../../../store/useAuthStore";
 
 export default function PrintSettings() {
   const [layout, setLayout] = useState("1");
-
+const {user}=useAuthStore()
   const saveLayout = async () => {
     await axios.post(
-      "api/print-settings",
+      `api/print-settings?userId=${user?.id}`,
       { layout },
       { withCredentials: true },
     );
