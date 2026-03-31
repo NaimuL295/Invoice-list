@@ -1,94 +1,62 @@
-import React, { useRef,  } from "react";
-import { useReactToPrint } from "react-to-print";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import useAuthStore from "../../../../store/useAuthStore";
+import { pdf } from "@react-pdf/renderer";
+import { Printer } from "lucide-react";
 import api from "../../../../lib/axios";
 
-//  Layout
-type LayoutProps = {
-  title?: string;
-};
+// Layout imports
+import LayoutOne from "./LayoutPdf/LayoutOne";
+import LayoutTwo from "./LayoutPdf/LayoutTwo";
+import LayoutThree from "./LayoutPdf/LayoutThree";
+import LayoutFour from "./LayoutPdf/LayoutFour";
 
-//  Layout Components
-const LayoutOne: React.FC<LayoutProps> = () => (
-  <div style={{ border: "1px solid black", padding: 20 }}>Layout 1</div>
-);
-
-const LayoutTwo: React.FC<LayoutProps> = () => (
-  <div style={{ border: "1px solid blue", padding: 20 }}>Layout 2</div>
-);
-
-const LayoutThree: React.FC<LayoutProps> = () => (
-  <div style={{ border: "1px solid green", padding: 20 }}>Layout 3</div>
-);
-
-const LayoutFour: React.FC<LayoutProps> = () => (
-  <div style={{ border: "1px solid red", padding: 20 }}>Layout 4</div>
-);
-
-// Layout map (Best Practice)
-const layoutMap: Record<string, React.FC<LayoutProps>> = {
+const layoutMap: Record<string, React.FC<{ data: any }>> = {
   "1": LayoutOne,
   "2": LayoutTwo,
   "3": LayoutThree,
   "4": LayoutFour,
 };
 
-const PrintPreview = () => {
-  const { user } = useAuthStore();
-  // const [layout, setLayout] = useState<string>("1");
-  const componentRef = useRef<HTMLDivElement>(null);
-  const fetchPrint = async () => {
-    const res = await api.get(`/api/invoice?userid=${user?.id}`, {
-      withCredentials: true,
-    });
-    return res.data;
-  };   
-  const { data, isPending, isError } = useQuery({
-    queryKey: ["PrintPreview", user?.id as number],
-    queryFn: fetchPrint,
+type PrintPreviewProps = {
+  invoiceId: string;
+};
+
+const PrintPreview: React.FC<PrintPreviewProps> = ({ invoiceId }) => {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["invoice", invoiceId],
+    queryFn: async () => {
+      const res = await api.get(`/api/invoice/${invoiceId}`, { withCredentials: true });
+      return res.data.data;
+    },
+    enabled: !!invoiceId,
   });
-  //  Fetch layout from backend
-  // useEffect(() => {
-  //   const fetchLayout = async () => {
-  //     try {
-  //       const res = await api.get(`/api/print-settings?userId=${user?.id}`, {
-  //         withCredentials: true,
-  //       });
 
-  //       // safe check
-  //       if (res.data?.layout) {
-  //         setLayout(String(res.data.layout));
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to fetch layout", error);
-  //     }
-  //   };
+  if (isLoading) return <p className="text-center mt-10">Loading invoice...</p>;
+  if (isError) return <p className="text-center mt-10">Error loading invoice</p>;
+  if (!data) return null;
 
-  //   fetchLayout();
-  // }, []);
-
-  //  Print handler
-  const handlePrint = useReactToPrint({
-    contentRef: componentRef,
-    documentTitle: "Invoice Print",
-  });
-  //Select layout safely
   const LayoutComponent = layoutMap[data.layout] || LayoutOne;
 
-  return (
-    <div>
-      <div ref={componentRef}>
-        <LayoutComponent />
-      </div>
+  const handlePrint = async () => {
+    const doc = <LayoutComponent data={data} />;
+   
+    
+    const blob = await pdf(doc).toBlob();
+    const url = URL.createObjectURL(blob);
+    window.open(url); // Opens PDF in new tab
+  };
 
+  return (
+    <div className="">
       <button
         onClick={handlePrint}
-        style={{ marginTop: 20, padding: "8px 16px" }}
       >
-        Print Preview
+        <Printer size={20} /> 
       </button>
     </div>
+
+
+
   );
 };
 

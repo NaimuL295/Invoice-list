@@ -7,10 +7,10 @@ export default function Settings() {
     <div>
         <ul>
             <li>
-                <Link to="">PrintSettings</Link>
+                <Link to="/">PrintSettings</Link>
             </li>
-                <li></li>
-
+                <li>  <Link to="/profile">Profile</Link></li>
+<li><Link to="/printSettings"> PrintSettings  </Link></li>
         </ul>
     </div>
     </div>

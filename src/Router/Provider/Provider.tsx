@@ -5,6 +5,7 @@ import api from "../../lib/axios";
 interface User {
   id: number;
   email: string;
+    user_name:string
 }
 
 function Provider({ children }: { children: React.ReactNode }) {
@@ -15,7 +16,7 @@ function Provider({ children }: { children: React.ReactNode }) {
     const checkAuth = async () => {
       try {
         const res = await api.get<User>("/me"); // type-safe
-        setUser(res.data);
+        setUser(res?.data);
       } catch {
         setUser(null);
       } finally {

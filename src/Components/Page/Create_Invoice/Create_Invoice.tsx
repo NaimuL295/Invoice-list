@@ -23,9 +23,9 @@ const [uid, setUid] = useState(1);
   const [received, setReceived] = useState<number | "">("");
   const [paymentType, setPaymentType] = useState("Cash");
   const [description, setDescription] = useState("");
-  const email: string = "naimul56@gmail.com";
-    const user_name: string = "naimul";
-      const userId: number = 2;
+  // const email: string = "naimul56@gmail.com";
+  //   const user_name: string = "naimul";
+  //     const userId: number = 2;
 console.log(user);
 
     // subtotal

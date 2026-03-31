@@ -11,9 +11,14 @@ import Settings from "../Components/Page/Settings/Settings";
 import Profile from "../Components/Page/Settings/Profile";
 import PrintSettings from "../Components/Page/Settings/PrintSettings/PrintSettings";
 import TransitionDetails from "../Components/Page/Home/TransitionDetails";
+
+
 //import ProtectedRoute from "./ProtectedRoute/ProtectedRoute";
 
 export const router = createBrowserRouter([
+
+
+  
   {
     path: "/",
     Component: Layout,
@@ -23,6 +28,7 @@ export const router = createBrowserRouter([
       { path: "create/add_Item", Component: Add_Item },
       { path: "/edit/:id", Component: Edit_Item_Page },
       { path: "profile", Component: Profile },
+    // { path: "/print/:id", element: <PrintPreview /> },
       {
         path: "auth",
         Component: Auth,
