@@ -2,11 +2,9 @@ import {  useState } from "react";
 import { useInvoiceStore } from "../../../store/useInvoiceStore";
 import { Link, useNavigate } from "react-router";
 import Invoice_Items from "../../Share/Invoice_Items";
-import { Printer } from "lucide-react";
+import {   Printer,   } from "lucide-react";
 import api from "../../../lib/axios";
 import useAuthStore from "../../../store/useAuthStore";
-
-
 
 
 export default function Create_Invoice() {
@@ -302,4 +300,24 @@ console.log(invoiceData);
       </form>
     </div>
   );
+
 }
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+

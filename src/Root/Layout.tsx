@@ -10,7 +10,7 @@ export default function Layout() {
   return (
     <div>
       
-     {pathname =="/setting" ? "" : <Navbar/>   }    
+     {!["/setting" ,"/auth/login" ,  "/auth/register"  ].includes(pathname)   && <Navbar/>      }    
       <Outlet/>
     </div>
   )

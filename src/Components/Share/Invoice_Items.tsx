@@ -3,7 +3,7 @@ import { useInvoiceStore } from "../../store/useInvoiceStore";
 
 export default function Invoice_Items() {
   const items = useInvoiceStore((state) => state.items);
-  // const navigate = useNavigate();
+
 
   return (
     <div className="space-y-3">
@@ -24,15 +24,7 @@ export default function Invoice_Items() {
               <span className="font-bold">৳ {item.total}</span>
             </div>
           </div>
-          {/* <div className="flex gap-2 mt-3">
-            <button
-            type="button"
-              className="text-blue-500 text-sm"
-              onClick={() => navigate(`/edit/${item.id}`)}
-            >
-              Edit
-            </button>
-          </div> */}
+       
           </Link>
         </div>
       ))}
