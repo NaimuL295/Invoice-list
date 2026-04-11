@@ -11,30 +11,31 @@ export type Item = {
 
 type InvoiceStore = {
   items: Item[];
+  setItems: (items: Item[]) => void; // <--- Add line
   addItem: (item: Item) => void;
-  editItem: (updatedItem: Item) => void; 
-  deleteItem: (id:number) => void;
+  editItem: (updatedItem: Item) => void;
+  deleteItem: (id: number) => void;
   clearItems: () => void;
 };
 
 export const useInvoiceStore = create<InvoiceStore>((set) => ({
   items: [],
-
+  setItems: (newItems) => set({ items: newItems }),
   addItem: (item) =>
     set((state) => ({
       items: [...state.items, item],
     })),
 
-editItem: (updatedItem) =>
-  set((state) => ({
-    items: state.items.map((item) =>
-      item.id === updatedItem.id ? updatedItem : item
-    ),
-  })),
-deleteItem: (id) =>
-  set((state) => ({
-    items: state.items.filter((item) => item.id !== id),
-  })),
+  editItem: (updatedItem) =>
+    set((state) => ({
+      items: state.items.map((item) =>
+        item.id === updatedItem.id ? updatedItem : item,
+      ),
+    })),
+  deleteItem: (id) =>
+    set((state) => ({
+      items: state.items.filter((item) => item.id !== id),
+    })),
 
-   clearItems: () => set({ items: [] }),
+ clearItems: () => set({ items: [] }),
 }));

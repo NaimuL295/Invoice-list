@@ -1,11 +1,12 @@
 import type React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { toast } from "react-toastify";
-import { ReceiptText, Loader2 } from "lucide-react";
+import { ReceiptText, Loader2, Eye, EyeOff } from "lucide-react";
 import Social from "../../Share/Social";
 import api from "../../../lib/axios";
-import useAuthStore from "../../../store/useAuthStore";
+import Swal from "sweetalert2";
+
+
 
 interface formData {
   user_name: string;
@@ -14,9 +15,10 @@ interface formData {
 }
 
 export default function Register() {
-  const { setUser } = useAuthStore();
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
+  const [isTrue, setTrue] = useState<boolean>(false);
   const [form, setForm] = useState<formData>({
     user_name: "",
     email: "",
@@ -31,34 +33,55 @@ export default function Register() {
     }));
   };
 
-  const Handler = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
 
-    try {
-      const res = await api.post("/auth/register", form, {
-        withCredentials: true,
+
+const Handler = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    const res = await api.post("/auth/login", form, {
+      withCredentials: true,
+    });
+
+    if (res.status === 200 || res.status === 201) {
+      
+      // ✅ SUCCESS ALERT
+      await Swal.fire({
+        icon: "success",
+        title: "Welcome back!",
+        text: "Login successful",
+        timer: 1500,
+        showConfirmButton: false,
       });
 
-      if (res.status === 200 || res.status === 201) {
-        toast.success("Account created successfully!");
-        setUser(res.data.user);
-        navigate("/");
-      }
-    } catch (err: unknown) {
-      const errorMsg =
-        (err && typeof err === "object" && "response" in err
-          ? (err as { response?: { data?: { message?: string } } }).response
-              ?.data?.message
-          : undefined) ||
-        (err instanceof Error ? err.message : String(err)) ||
-        "Registration failed. Try again.";
-
-      toast.error(errorMsg);
-    } finally {
-      setLoading(false);
+      
+      navigate("/");
     }
-  };
+  } catch (err: unknown) {
+    let errorMsg = "Login failed. Please check your credentials.";
+
+    if (err && typeof err === "object" && "response" in err) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      errorMsg = axiosErr.response?.data?.message || errorMsg;
+    } else if (err instanceof Error) {
+      errorMsg = err.message;
+    } else {
+      errorMsg = String(err);
+    }
+
+    // ❌ ERROR ALERT
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text: errorMsg,
+    });
+
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
@@ -119,23 +142,29 @@ export default function Register() {
           </div>
 
           {/* Password Input */}
-          <div className="space-y-2">
+          <div className="space-y-2 relative ">
             <label className="text-sm font-medium text-gray-700 ml-1">
               Password
             </label>
             <input
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:text-gray-600 focus:bg-white outline-none transition-all disabled:opacity-50"
-              type="password"
+              type={isTrue ? "text" : "password"}
               name="password"
               value={form.password}
               onChange={handlerForm}
               placeholder="••••••••"
               required
-         autoComplete="current-password"
+              autoComplete="current-password"
               disabled={loading}
             />
+            <button
+              className="absolute top-9 right-3"
+              type="button"
+              onClick={() => setTrue(!isTrue)}
+            >
+              {isTrue ? <Eye /> : <EyeOff />}
+            </button>
           </div>
-
           <button
             type="submit"
             disabled={loading}
@@ -157,7 +186,6 @@ export default function Register() {
           </span>
           <div className="h-[1px] flex-1 bg-slate-100"></div>
         </div>
-
         <Social />
       </div>
 

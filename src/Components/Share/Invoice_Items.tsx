@@ -3,8 +3,6 @@ import { useInvoiceStore } from "../../store/useInvoiceStore";
 
 export default function Invoice_Items() {
   const items = useInvoiceStore((state) => state.items);
-
-
   return (
     <div className="space-y-3">
       {items.map((item, index) => (

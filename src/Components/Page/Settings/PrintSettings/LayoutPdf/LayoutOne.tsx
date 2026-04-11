@@ -1,6 +1,6 @@
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
 import type { Invoice, subItem } from "../../../../../types/type";
-import { ToWords } from 'to-words';
+import { toWords } from 'to-words';
 interface LayoutProps {
   title?: string;
   data: Invoice;
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   // Summary Section
   summaryContainer: {
     flexDirection: "row",
-    marginTop: "auto", // Pushes to bottom of main container if flex-grow is used
+  
     borderTop: "1pt solid #ccc",
   },
   summaryLeft: {
@@ -130,6 +130,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+    amountWordsLabel: {
+    color: "white",
+    padding: 4,
+    display:"flex",
+    justifyContent:"center",
+    fontWeight: "bold",
+  }
+
 });
 
 export default function LayoutThree({ title, data }: LayoutProps) {
@@ -205,7 +213,10 @@ export default function LayoutThree({ title, data }: LayoutProps) {
 
           {/* Summary Section */}
           <View style={styles.summaryContainer}>
+          
             <View style={styles.summaryLeft}>
+                 <Text>Invoice Amount In Words:</Text>  <Text>{toWords(invoiceData?.subtotal)}</Text>
+                
               <Text style={{ fontWeight: "bold" }}>Terms And Conditions:</Text>
               <Text style={{ marginTop: 5, color: "#666" }}>
                 Thank you for doing business with us.

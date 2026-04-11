@@ -6,6 +6,6 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
  const {user}=useAuthStore()
  
 
- if (!user?.id|| !user.email) return <Navigate to="auth/login"/>
+if (!user?.id || !user.email) return <Navigate to="/auth/register" replace />;
     return <>{children}</>
 }

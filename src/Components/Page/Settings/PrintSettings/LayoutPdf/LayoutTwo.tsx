@@ -220,7 +220,6 @@ export default function LayoutTwo({ title, data }: LayoutProps) {
             </View>
           </View>
         </View>
-
         <View style={{ marginTop: 40, alignItems: 'flex-end' }}>
           <View style={{ borderTopWidth: 1, borderTopColor: '#000', width: 150, paddingTop: 5 }}>
             <Text style={{ textAlign: 'center', fontSize: 9 }}>Authorized Signatory</Text>

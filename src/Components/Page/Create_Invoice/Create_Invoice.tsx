@@ -5,15 +5,17 @@ import Invoice_Items from "../../Share/Invoice_Items";
 import {   Printer,   } from "lucide-react";
 import api from "../../../lib/axios";
 import useAuthStore from "../../../store/useAuthStore";
+import Swal from "sweetalert2";
 
 
 export default function Create_Invoice() {
-  const {user}=useAuthStore()
+  const {user }=useAuthStore()
+   const { setItems } = useInvoiceStore();
   const items = useInvoiceStore((state) => state.items);
 const navigate = useNavigate();
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [customer, setCustomer] = useState("");
-const [uid, setUid] = useState(1);
+ const [invoiceId, setInvoiceId] = useState(() => String(crypto.randomUUID().split("-")[0]));
 
 // const clearItems = useInvoiceStore((state) => state.clearItems);
 
@@ -21,10 +23,7 @@ const [uid, setUid] = useState(1);
   const [received, setReceived] = useState<number | "">("");
   const [paymentType, setPaymentType] = useState("Cash");
   const [description, setDescription] = useState("");
-  // const email: string = "naimul56@gmail.com";
-  //   const user_name: string = "naimul";
-  //     const userId: number = 2;
-console.log(user);
+
 
     // subtotal
   const subtotal = items.reduce((acc, item) => {
@@ -35,23 +34,21 @@ console.log(user);
   const total = subtotal - Number(discount || 0);
   // // balance
   const balance = total - Number(received || 0);
-const createId = () => {
-  const id = uid + 1;
-  setUid(id);
-  return id;
-};
+
 const handleSubmit = async (e: React.FormEvent): Promise<void> => {
   e.preventDefault();
 
-const newId = createId(); 
-
   if (!customer || items.length === 0) {
-    alert("Customer and items required");
+    Swal.fire({
+      icon: "warning",
+      title: "Missing ",
+      text: "Customer and items required!",
+    });
     return;
   }
 
   const invoiceData = {
-    uid: String(newId),
+    uid: String(invoiceId),
     userId: user?.id,
     user_name: user?.user_name,
     email: user?.email,
@@ -66,258 +63,223 @@ const newId = createId();
     description,
     paymentType,
   };
-console.log(invoiceData);
 
   try {
-    const req = await api.post(
-      "/invoice",
-      invoiceData
-    );
-
-    if (req.status === 200 || req.status === 201) {
-      console.log("Invoice processed successfully!");
-      //  clearItems(); 
-      // setCustomer("");
-      // setDiscount(0);
-      // setReceived(0);
+    const response = await api.post("/api/create", invoiceData, {
+      withCredentials: true,
+    });
+ setItems([]);
+    if (response.status === 200 || response.status === 201) {
+      await Swal.fire({
+        icon: "success",
+        title: "Success 🎉",
+        text: "Invoice created successfully!",
+        confirmButtonColor: "#3085d6",
+      });
 
       navigate("/");
-   
+     
+      setCustomer("");
+      setDiscount(0);
+      setReceived(0);
+
     }
   } catch (error) {
     console.error("Error creating invoice:", error);
+
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Something went wrong!",
+    });
   }
 };
 
-  return (
-    <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-6 relative">
-      <h1 className="text-2xl sm:text-3xl font-bold text-center">
-        <Link to="/"> Create Invoice</Link>
-      </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Invoice + Date */}
-        <div className="grid  grid-cols-2 gap-4   border-b-black">
+ 
+return (
+  <div className="max-w-5xl lg:mx-auto p-2 sm:p-8">
+   
+
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      {/* LEFT COLUMN: Main Details & Items */}
+      <div className="space-y-4">
+        {/* Invoice Info Header */}
+        <section className="grid grid-cols-2 gap-4 bg-gray-50 p-5 rounded-2xl border border-gray-100">
           <div>
-            <label className="block font-medium mb-1">Invoice No</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Invoice No</label>
             <input
               type="text"
-       defaultValue={uid}
-              className="w-full  p-2 rounded-lg  border-none  focus:outline-none "
-              placeholder=""
+              value={invoiceId}
+              onChange={(e) => setInvoiceId(e.target.value)}
+              className="w-full bg-transparent font-bold outline-none text-gray-800"
             />
           </div>
-
           <div>
-            <label className="block font-medium mb-1">Date</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Date</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full    p-2 rounded-lg  border-none  focus:outline-none"
+              className="w-full bg-transparent outline-none font-medium"
             />
           </div>
-        </div>
+        </section>
 
-        {/* Customer */}
-
-        <div className="relative ">
+        {/* Floating Label Customer Input */}
+        <div className="relative group">
           <input
             id="name"
             type="text"
             value={customer}
             onChange={(e) => setCustomer(e.target.value)}
-            placeholder=""
             required
-            className="peer w-full border border-gray-300 rounded-lg px-3 pt-5 pb-2 focus:outline-none focus:"
+            className="peer w-full border-b-2 border-gray-200 py-3 focus:border-black outline-none transition-colors bg-transparent"
+            placeholder=" "
           />
-
-          <label
+          <label 
             htmlFor="name"
-            className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-500 transition-all
-    peer-placeholder-shown:top-3
-    peer-placeholder-shown:text-base
-    peer-placeholder-shown:text-gray-400
-    peer-focus:-top-2
-    peer-focus:text-sm
-   "
+            className="absolute left-0 top-3 text-gray-400 pointer-events-none transition-all 
+            peer-focus:-top-4 peer-focus:text-xs peer-focus:text-black 
+            peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-xs"
           >
             Customer Name
           </label>
         </div>
-       
-        {/* Item List */}
-        <div className="space-y-3">
+
+        {/* Items Section */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-center border-b border-gray-100 pb-2">
+            <h3 className="font-bold text-gray-800 text-lg">Product Items</h3>
+            <span className="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-500">
+              {/* Assuming items is an array in your state */}
+              List View
+            </span>
+          </div>
+
           <Invoice_Items />
+
+          <Link
+            to="add_item"
+            className="flex items-center justify-center w-full py-3 border-2 border-dashed border-gray-200 text-gray-500 rounded-xl hover:border-black hover:text-black hover:bg-gray-50 transition-all text-sm font-semibold"
+          >
+            + Add Product to Invoice
+          </Link>
         </div>
+      </div>
 
-        {/* Add Item */}
-        <Link to="add_item">
-          {" "}
-          <div className="border p-2 flex justify-center w-full sm:w-auto mx-auto mt-6">
-            Add_Item
-          </div>
-        </Link>
-        {/* Tax & Discount */}
-        <section className="space-y-2">
-          <span className="font-semibold text-lg">Tax & Discount</span>
+      {/* RIGHT COLUMN: Summary & Payment (Sticky) */}
+      <div className="space-y-4 bg-gray-50 p-6 rounded-3xl h-fit lg:sticky lg:top-8 border border-gray-100 shadow-sm">
+        <h3 className="font-bold text-xl text-gray-900 mb-4">Summary</h3>
 
-          {/* Discount */}
-          <div className="flex justify-between items-center">
-            <span>Discount</span>
-
-            <div className="flex items-center gap-1">
-              <span>৳ %</span>
-
-              {/* <input
-                type="number"
-                value={discount}
-                onChange={(e) => setDiscount(Number(e.target.value))}
-                className="w-24 sm:w-28 border-b focus:border-black outline-none"
-              /> */}
+        {/* Pricing Breakdown */}
+        <div className="space-y-3 border-b border-gray-200 pb-4">
+          <div className="flex justify-between items-center text-gray-600">
+            <span>Discount Amount</span>
+            <div className="flex items-center gap-2 bg-white px-3 py-1 rounded-lg border border-gray-200">
+              <span className="text-xs text-gray-400 font-bold">৳</span>
               <input
                 type="number"
                 value={discount}
-                onChange={(e) =>
-                  setDiscount(
-                    e.target.value === "" ? "" : Number(e.target.value),
-                  )
-                }
-                className="w-24 sm:w-28 border-b outline-none"
+                onChange={(e) => setDiscount(e.target.value === "" ? "" : Number(e.target.value))}
+                className="w-20 text-right outline-none font-medium"
               />
             </div>
           </div>
 
-          {/* Total Amount */}
-          <div className="flex justify-between items-center">
-            <span className="font-semibold text-lg">Total Amount</span>
-
-            <div className="flex items-center gap-1">
-              <span>৳</span>
-
-              <input
-                type="text"
-                value={total}
-                readOnly
-                className="w-28 sm:w-32 border-b font-bold outline-none"
-              />
-            </div>
+          <div className="flex justify-between items-center pt-2">
+            <span className="text-xl font-black text-gray-900">Total Amount</span>
+            <span className="text-2xl font-black text-yellow-600">
+              ৳{total?.toLocaleString()}
+            </span>
           </div>
-
-          {/* Received */}
-          <div className="flex justify-between items-center">
-            <label className="flex items-center gap-2">
-              <input type="checkbox" />
-              Received
-            </label>
-
-            <div className="flex items-center gap-1">
-              <span>৳</span>
-
-              {/* <input
-                type="number"
-                value={received}
-                onChange={(e) => setReceived(Number(e.target.value))}
-                className="w-24 sm:w-28 border-b outline-none"
-              /> */}
-              <input
-                type="number"
-                value={received}
-                onChange={(e) =>
-                  setReceived(
-                    e.target.value === "" ? "" : Number(e.target.value),
-                  )
-                }
-                className="w-24 sm:w-28 border-b outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Balance */}
-          <div className="flex justify-between items-center">
-            <span>Balance Due</span>
-
-            <div className="flex items-center gap-1">
-              <span>৳</span>
-
-              <input
-                type="text"
-                value={balance}
-                readOnly
-                className="w-24 sm:w-28 border-b outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Payment Type */}
-          <div className="space-y-2">
-            <span className="font-medium">Payment Type</span>
-
-            <div className="">
-              <select
-                value={paymentType}
-                onChange={(e) => setPaymentType(e.target.value)}
-                className="border px-1 py-1 rounded w-full"
-              >
-                <option>Cash</option>
-                <option>Bkash</option>
-                <option>Card</option>
-              </select>
-
-              <button
-                type="button"
-                className="px-3 py-2 bg-gray-200 rounded w-full sm:w-auto"
-              >
-                + Payment
-              </button>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2">
-            <span className="font-medium">Description</span>
-
-            <textarea
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full border rounded p-2 outline-none"
-            />
-          </div>
-        </section>
-
-        {/* Submit */}
-        <div className="flex gap-10">
-           <button
-          type="submit"
-          className="w-full py-3 bg-black text-white rounded-lg"
-        >
-          Save Invoice
-        </button><button type="button"   //onClick={handlePrint}
-        ><Printer /> </button>
         </div>
-          
-      </form>
-    </div>
-  );
 
-}
+        {/* Received & Balance */}
+        <div className="space-y-3 pt-2">
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm font-bold text-gray-500 uppercase">Received</span>
+              <span className="text-xs text-green-500 font-bold">Paid</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-bold text-gray-400">৳</span>
+              <input
+                type="number"
+                value={received}
+                onChange={(e) => setReceived(e.target.value === "" ? "" : Number(e.target.value))}
+                className="w-full text-2xl font-bold text-green-600 outline-none"
+              />
+            </div>
+          </div>
 
+          <div className="flex justify-between px-2">
+            <span className="font-semibold text-gray-500">Balance Due</span>
+            <span className={`font-bold text-lg ${balance > 0 ? "text-red-500" : "text-gray-400"}`}>
+              ৳{balance?.toLocaleString()}
+            </span>
+          </div>
+        </div>
 
+        {/* Payment Method Pills */}
+        <div className="space-y-3">
+          <label className="block font-bold text-sm text-gray-600">Payment Method</label>
+          <div className="flex gap-2 flex-wrap">
+            {["Cash", "Bkash", "Card", "Bank"].map((method) => (
+              <label
+                key={method}
+                className={`cursor-pointer px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                  paymentType === method
+                    ? "bg-black text-white border-black"
+                    : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  value={method}
+                  checked={paymentType === method}
+                  onChange={() => setPaymentType(method)}
+                  className="hidden"
+                />
+                {method}
+              </label>
+            ))}
+          </div>
+        </div>
 
+        {/* Internal Notes */}
+        <div className="space-y-2">
+          <label className="block font-bold text-sm text-gray-600">Note / Description</label>
+          <textarea
+            rows={2}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full p-3 border-2 border-gray-100 rounded-xl bg-white outline-none focus:border-black text-sm transition-all"
+            placeholder="Click to add note..."
+          />
+        </div>
 
-
-
-
+        {/* Action Buttons */}
+        <div className="flex gap-3 pt-4">
+          <button
+            type="submit"
+            className="grow py-4 bg-black text-white rounded-2xl font-bold hover:bg-gray-800 transition-all shadow-xl active:scale-95"
+          >
+            Save Invoice
+          </button>
+          <button 
+            type="button"
+            className="p-4 bg-white border-2 border-gray-200 text-gray-600 rounded-2xl hover:bg-gray-50 transition-all"
+          >
+            <Printer size={24} />
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+);
 
 
   
-
-
-
-
-
-
-
-
-
+}

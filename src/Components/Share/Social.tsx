@@ -1,7 +1,7 @@
 export default function Social() {
   const loginWithGoogle = () => {
     // Tip: Use an environment variable for the base URL in production
-    window.location.href = "http://localhost:5000/auth/google";
+    window.location.href = "https://invoice-server-vvx0.onrender.com/auth/google";
   };
 
   return (

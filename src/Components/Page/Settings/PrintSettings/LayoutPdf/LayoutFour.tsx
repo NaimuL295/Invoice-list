@@ -1,5 +1,5 @@
-import React from "react";
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
+import type { subItem } from "../../../../../types/type";
 
 export default function LayoutFour({ title, data }: { title?: string; data?: any }) {
   const styles = StyleSheet.create({
@@ -24,9 +24,9 @@ export default function LayoutFour({ title, data }: { title?: string; data?: any
 
         <View style={styles.section}>
           <Text style={styles.headerText}>Items:</Text>
-          {data?.items?.map((item: any, index: number) => (
+          {data?.items?.map((item: subItem, index: number) => (
             <Text style={styles.item} key={index}>
-              {item.name} — {item.quantity} × {item.price}
+              {item.item_name} — {item.quantity} × {item.price}
             </Text>
           ))}
         </View>

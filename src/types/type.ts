@@ -40,7 +40,7 @@ export interface Item {
 }
 
 export interface Invoice {
-  id: number;
+  id?: number;
   user_name:string;
   companyEmail:string
   uid: string;
