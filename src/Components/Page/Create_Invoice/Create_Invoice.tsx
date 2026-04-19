@@ -31,7 +31,7 @@ const navigate = useNavigate();
   }, 0);
 
   // total after discount
-  const total = subtotal - Number(discount || 0);
+  const total =   (subtotal * Number(discount || 0)) / 100;
   // // balance
   const balance = total - Number(received || 0);
 
