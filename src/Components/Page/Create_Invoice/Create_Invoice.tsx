@@ -24,17 +24,16 @@ const navigate = useNavigate();
   const [paymentType, setPaymentType] = useState("Cash");
   const [description, setDescription] = useState("");
 
+// subtotal
+const subtotal = items.reduce((acc, item) => {
+  return acc + item.quantity * item.price;
+}, 0);
 
-    // subtotal
-  const subtotal = items.reduce((acc, item) => {
-    return acc + item.quantity * item.price;
-  }, 0);
+// total after discount
+const total = subtotal - (subtotal * Number(discount || 0)) / 100;
 
-  // total after discount
-  const total =   (subtotal * Number(discount || 0)) / 100;
-  // // balance
-  const balance = total - Number(received || 0);
-
+// balance
+const balance = total - Number(received || 0);
 const handleSubmit = async (e: React.FormEvent): Promise<void> => {
   e.preventDefault();
 

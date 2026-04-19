@@ -229,57 +229,50 @@ export default function TransitionDetails() {
 
 <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
   {invoices.map((inv: Invoice) => {
-    const total = inv?.subtotal || 0;
-    const received = inv?.received || 0;
+    const total = inv.total || 0;
+    const received = inv.received || 0;
     const due = total - received;
 
     return (
       <div
-        key={inv?.id}
-        className="bg-white border border-gray-100 rounded-2xl p-4 hover:shadow-md transition"
+        key={inv.id}
+        className="bg-white border border-gray-100 rounded-2xl p-4 hover:shadow-md transition relative"
       >
         <div className="flex justify-between items-start">
 
           {/* LEFT INFO */}
-          <Link to={`/modify/${inv?.id}`} className="space-y-1">
-
-            {/* ID */}
+          <Link to={`/modify/${inv.id}`} className="space-y-1">
             <p className="text-xs text-gray-400">
-              Invoice #{inv?.id}
+              Invoice #{inv.id}
             </p>
 
-            {/* TOTAL */}
             <p className="text-sm font-bold text-gray-800">
               Total ৳ {total}
             </p>
 
-            {/* RECEIVED */}
             <p className="text-sm font-semibold text-blue-600">
               Received ৳ {received}
             </p>
 
-            {/* DUE */}
-            <p className={`text-sm font-semibold ${
-              due > 0 ? "text-red-600" : "text-green-600"
-            }`}>
+            <p
+              className={`text-sm font-semibold ${
+                due > 0 ? "text-red-600" : "text-green-600"
+              }`}
+            >
               {due > 0 ? `Due ৳${due}` : "No Due"}
             </p>
 
-            {/* DATE */}
             <p className="text-[11px] text-gray-500">
-              {inv?.createdAt
+              {inv.createdAt
                 ? new Date(inv.createdAt).toLocaleString()
                 : "No Date"}
             </p>
-
           </Link>
 
           {/* RIGHT ACTION */}
           <div className="flex flex-col items-end gap-2">
+            <PrintPreview invoiceId={inv.id?.toString() || ""} />
 
-            <PrintPreview invoiceId={inv?.id?.toString() || ""} />
-
-            {/* STATUS BADGE */}
             <span
               className={`text-[10px] px-2 py-1 rounded-full font-bold ${
                 due > 0
@@ -290,10 +283,9 @@ export default function TransitionDetails() {
               {due > 0 ? "UNPAID" : "PAID"}
             </span>
 
-            {/* MENU */}
             <button
               onClick={() =>
-                setOpenMenuId(openMenuId === inv.id ? null : inv.id ?? null)
+             setOpenMenuId(openMenuId === inv.id ? null : inv.id ?? null)
               }
               className="text-gray-400 hover:text-black"
             >
@@ -310,16 +302,14 @@ export default function TransitionDetails() {
                 </button>
 
                 <button
-                  onClick={() => onDelete(inv?.id)}
+                  onClick={() => onDelete(inv.id)}
                   className="w-full px-2 py-2 text-red-500 hover:bg-red-50 flex gap-1"
                 >
                   <Trash2 size={12} /> Delete
                 </button>
               </div>
             )}
-
           </div>
-
         </div>
       </div>
     );

@@ -54,9 +54,7 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ invoiceId }) => {
       const url = URL.createObjectURL(blob);
 
       // Open in new tab
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const printWindow: Window | null = window.open(url);
-
+            window.open(url);
       // Safety: Revoke URL after a minute to prevent memory leaks
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     } catch (err) {

@@ -1,34 +1,98 @@
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
-import type { subItem } from "../../../../../types/type";
+import type { Invoice, subItem } from "../../../../../types/type";
+import { toWords } from "to-words/en-US";
 
-export default function LayoutFour({ title, data }: { title?: string; data?: any }) {
+interface LayoutProps {
+  title?: string;
+  data: Invoice;
+}
+
+export default function LayoutFour({ title, data }: LayoutProps) {
+  const invoiceData = {
+    user_name: data?.user_name || "Company Name",
+    companyEmail: data?.email || "email@example.com",
+    invoiceNo: data?.uid || "0",
+    billTo: data?.customer || "Customer Name",
+    date: data?.date || "00-00-0000",
+    items: data?.items || [],
+    received: Number(data?.received) || 0,
+    discount: Number(data?.discount) || 0,
+    subtotal: Number(data?.subtotal || data?.total) || 0,
+    total: Number(data?.total) || 0,
+  };
+
+  const due = invoiceData.total - invoiceData.received;
+
   const styles = StyleSheet.create({
-    page: { padding: 24, fontSize: 12, backgroundColor: "#f3f4f6" }, // bg-gray-100 p-6
-    title: { fontSize: 24, fontWeight: "bold", marginBottom: 12 }, // text-2xl font-bold mb-3
-    section: { marginBottom: 8 }, // mb-2
-    item: { marginBottom: 4 }, // mb-1
-    headerText: { fontSize: 14, fontWeight: "bold" }, // text-base font-bold
+    page: {
+      padding: 20,
+      fontSize: 10,
+      backgroundColor: "#ffffff",
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 10,
+      textAlign: "center",
+    },
+    section: {
+      marginBottom: 8,
+    },
+    headerText: {
+      fontSize: 12,
+      fontWeight: "bold",
+      marginBottom: 4,
+    },
+    itemRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 3,
+      borderBottom: "1 solid #ddd",
+      paddingBottom: 2,
+    },
+    totalSection: {
+      marginTop: 10,
+      borderTop: "1 solid #000",
+      paddingTop: 6,
+    },
+    totalText: {
+      marginBottom: 2,
+    },
   });
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.title}>{title || "Invoice Layout Four"}</Text>
+      <Page size="A5" style={styles.page}>
+        <Text style={styles.title}>{title || "Invoice"}</Text>
 
         <View style={styles.section}>
-          <Text style={styles.headerText}>Invoice Details:</Text>
-          <Text>Invoice ID: {data?.id}</Text>
-          <Text>Customer: {data?.customerName}</Text>
-          <Text>Total: {data?.total}</Text>
+          <Text style={styles.headerText}>Invoice Details</Text>
+          <Text>Invoice No: {invoiceData.invoiceNo}</Text>
+          <Text>Customer: {invoiceData.billTo}</Text>
+          <Text>Date: {invoiceData.date}</Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.headerText}>Items:</Text>
-          {data?.items?.map((item: subItem, index: number) => (
-            <Text style={styles.item} key={index}>
-              {item.item_name} — {item.quantity} × {item.price}
-            </Text>
+          <Text style={styles.headerText}>Items</Text>
+          {invoiceData.items.map((item: subItem, index: number) => (
+            <View style={styles.itemRow} key={index}>
+              <Text>{item.item_name}</Text>
+              <Text>
+                {item.quantity} × {item.price}
+              </Text>
+            </View>
           ))}
+        </View>
+
+        <View style={styles.totalSection}>
+          <Text style={styles.totalText}>Subtotal: {invoiceData.subtotal}</Text>
+          <Text style={styles.totalText}>Discount: {invoiceData.discount}%</Text>
+          <Text style={styles.totalText}>Total: {invoiceData.total}</Text>
+          <Text style={styles.totalText}>Received: {invoiceData.received}</Text>
+          <Text style={styles.totalText}>Due: {due}</Text>
+          <Text style={styles.totalText}>
+            In Words: {toWords(invoiceData.total)}
+          </Text>
         </View>
       </Page>
     </Document>
